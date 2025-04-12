@@ -1,42 +1,39 @@
-cmake_minimum_required(VERSION 3.11) # FetchContent is available in 3.11+
+cmake_minimum_required(VERSION 3.30)
 project(DasherGameCLion)
 
-# Generate compile_commands.json
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_C_STANDARD 23)
 
-# Dependencies
-set(RAYLIB_VERSION 5.5)
-find_package(raylib ${RAYLIB_VERSION} QUIET) # QUIET or REQUIRED
-if (NOT raylib_FOUND) # If there's none, fetch and build raylib
-  include(FetchContent)
-  FetchContent_Declare(
-    raylib
-    DOWNLOAD_EXTRACT_TIMESTAMP OFF
-    URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
-  )
-  FetchContent_GetProperties(raylib)
-  if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
-    set(FETCHCONTENT_QUIET NO)
-    FetchContent_MakeAvailable(raylib)
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # don't build the supplied examples
-  endif()
+# Include the command that downloads libraries
+include(FetchContent)
+
+# define a function for adding git dependencies
+function(include_dependency libName gitURL gitTag)
+    # setup the declare
+    FetchContent_Declare(${libName}
+            GIT_REPOSITORY ${gitURL}
+            GIT_TAG        ${gitTag}
+            GIT_SHALLOW    TRUE
+            GIT_PROGRESS   TRUE
+    )
+
+    FetchContent_MakeAvailable(${libName})
+endfunction()
+
+# add raylib support
+set(LIB1 raylib)
+find_package(${LIB1} QUIET)
+if (NOT ${LIB1}_FOUND)
+    message(STATUS "Getting ${LIB1} from Github")
+    include_dependency(${LIB1} https://github.com/raysan5/raylib.git 5.5)
+else()
+    message(STATUS "Using local ${LIB1}")
 endif()
 
-# Our Project
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-add_executable(${PROJECT_NAME} main.cpp)
-#set(raylib_VERBOSE 1)
-target_link_libraries(${PROJECT_NAME} raylib)
+add_executable(DasherGameClion main.cpp)
 
-# Web Configurations
-if (${PLATFORM} STREQUAL "Web")
-    set_target_properties(${PROJECT_NAME} PROPERTIES SUFFIX ".html") # Tell Emscripten to build an example.html file.
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_GLFW=3 -s ASSERTIONS=1 -s WASM=1 -s ASYNCIFY -s GL_ENABLE_GET_PROC_ADDRESS=1")
-endif()
+# set the include directory
+target_include_directories(DasherGameClion PRIVATE ${raylib_INCLUDE_DIRS})
 
-# Checks if OSX and links appropriate frameworks (Only required on MacOS)
-if (APPLE)
-    target_link_libraries(${PROJECT_NAME} "-framework IOKit")
-    target_link_libraries(${PROJECT_NAME} "-framework Cocoa")
-    target_link_libraries(${PROJECT_NAME} "-framework OpenGL")
-endif()
+# link all libraries to the project
+target_link_libraries(DasherGameClion PRIVATE ${LIB1})
