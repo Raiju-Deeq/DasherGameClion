@@ -14,7 +14,7 @@ int main()
 
     // Load the texture for nebula hazard
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png"); // Load the texture for the nebula hazard
-    Rectangle nebRec{0.0f, 0.0f, nebula.width/8,nebula.height/8}; // Create a rectangle for the nebula hazard
+    Rectangle nebRec{0.0f, 0.0f, (float)nebula.width/8,(float)nebula.height/8}; // Create a rectangle for the nebula hazard
     Vector2 nebPos{windowWidth, windowHeight - nebRec.height}; // Set the initial position of the nebula hazard
     int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
 
