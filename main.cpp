@@ -17,6 +17,12 @@ int main()
     Rectangle nebRec{0.0f, 0.0f, (float)nebula.width/8,(float)nebula.height/8}; // Create a rectangle for the nebula hazard
     Vector2 nebPos{windowWidth, windowHeight - nebRec.height}; // Set the initial position of the nebula hazard
     int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
+    // Nebula animation variables
+    int nebFrame{}; // Set the initial frame of the nebula animation
+    const float nebUpdateTime{1.f/12.f}; // Set the time between frames (12 frames per second)
+    float nebRunningTime{}; // Set the initial running time of the nebula animation
+
+
 
 
 
@@ -51,6 +57,7 @@ int main()
         DrawText ("Press ESC to exit", 0, 20, 10, BLACK);
         DrawText ("Press SPACE to jump", 0, 40, 10, BLACK);
 
+        //Update Scarfy animation
         if (!isAirborne) {
             runningTime += deltaTime; // Update the running time
             if (runningTime >= updateTime)
@@ -63,6 +70,20 @@ int main()
                 {
                     frame = 0; // Reset the frame to 0
                 }
+            }
+        }
+
+        // Update nebula animation
+        nebRunningTime += deltaTime; // Update the running time
+        if (nebRunningTime >= nebUpdateTime)
+        {
+            nebRunningTime = 0.0f; // Reset the running time
+            // updated animation frame
+            nebRec.x = nebFrame * nebRec.width; // Update the X position of the rectangle based on the frame
+            nebFrame++; // Increment the frame
+            if (nebFrame > 7) // Check if the frame is greater than 7
+            {
+                nebFrame = 0; // Reset the frame to 0
             }
         }
 
