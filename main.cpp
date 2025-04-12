@@ -11,6 +11,16 @@ int main()
     int gravity{1'000}; // Set the gravity value (in pixels per second)
     int jumpHeight{600}; // Set the jump height (In pixels per second)
 
+
+    // Load the texture for nebula hazard
+    Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png"); // Load the texture for the nebula hazard
+    Rectangle nebRec{0.0f, 0.0f, nebula.width/8,nebula.height/8}; // Create a rectangle for the nebula hazard
+    Vector2 nebPos{windowWidth, windowHeight - nebRec.height}; // Set the initial position of the nebula hazard
+    int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
+
+
+
+
     // Load the texture for the scarfy character
     Texture2D scarfy = LoadTexture("textures/scarfy.png"); // Load the texture for the scarfy character
     Rectangle scarfyRec; // Create a rectangle for the scarfy character
@@ -41,21 +51,27 @@ int main()
         DrawText ("Press ESC to exit", 0, 20, 10, BLACK);
         DrawText ("Press SPACE to jump", 0, 40, 10, BLACK);
 
-
-        runningTime += deltaTime; // Update the running time
-        if (runningTime >= updateTime)
-        {
-            runningTime = 0.0f; // Reset the running time
-            // updated animation frame
-            scarfyRec.x = frame * scarfyRec.width; // Update the X position of the rectangle based on the frame
-            frame++; // Increment the frame
-            if (frame > 5) // Check if the frame is greater than 5
+        if (!isAirborne) {
+            runningTime += deltaTime; // Update the running time
+            if (runningTime >= updateTime)
             {
-                frame = 0; // Reset the frame to 0
+                runningTime = 0.0f; // Reset the running time
+                // updated animation frame
+                scarfyRec.x = frame * scarfyRec.width; // Update the X position of the rectangle based on the frame
+                frame++; // Increment the frame
+                if (frame > 5) // Check if the frame is greater than 5
+                {
+                    frame = 0; // Reset the frame to 0
+                }
             }
         }
-        scarfyPos.y += velocity * deltaTime; // Update the Y position
-        DrawTextureRec(scarfy, scarfyRec, scarfyPos, DARKPURPLE); // Draw the scarfy character
+
+        scarfyPos.y += velocity * deltaTime; // Update scarfy position
+        nebPos.x += nebVelocity * deltaTime; // Update the nebula position
+
+        DrawTextureRec(scarfy, scarfyRec, scarfyPos, RED); // Draw the scarfy character
+        DrawTextureRec(nebula, nebRec, nebPos, WHITE); // Draw the nebula hazard
+
         if (IsKeyPressed(KEY_SPACE) && !isAirborne) // Check if the space key is pressed
         {
             velocity = -jumpHeight; // Set the velocity when space is pressed
@@ -76,5 +92,6 @@ int main()
         EndDrawing (); // End drawing
     }
     UnloadTexture (scarfy); // Unload the texture for the scarfy character
+    UnloadTexture (nebula); // Unload the texture for the nebula hazard
     CloseWindow ();
 }
