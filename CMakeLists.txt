@@ -29,7 +29,7 @@ else()
     message(STATUS "Using local ${LIB1}")
 endif()
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/bin")
 add_executable(DasherGameClion main.cpp)
 
 # set the include directory
@@ -37,3 +37,11 @@ target_include_directories(DasherGameClion PRIVATE ${raylib_INCLUDE_DIRS})
 
 # link all libraries to the project
 target_link_libraries(DasherGameClion PRIVATE ${LIB1})
+
+# Copy textures folder to the output directory
+add_custom_command(
+        TARGET DasherGameClion POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/textures"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/textures"
+)
