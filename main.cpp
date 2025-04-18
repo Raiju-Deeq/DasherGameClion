@@ -11,10 +11,13 @@ struct AnimData
 
 int main()
 {
+    // Array of integers to store window dimensions
+    int windowDimensions[2];
+    windowDimensions[0] = 800; // Set the width of the window
+    windowDimensions[1] = 600; // Set the height of the window
+
     // Initialize the window
-    const int windowWidth {800}; // Set the width of the window
-    const int windowHeight {600}; // Set the height of the window
-    InitWindow (windowWidth,windowHeight, "Dasher Game");
+    InitWindow (windowDimensions[0], windowDimensions[1], "Dasher Game");
     SetTargetFPS (60);
 
 
@@ -32,8 +35,8 @@ int main()
     scarfyData.rec.height = scarfy.height; // Set the height of the rectangle based on the texture height
     scarfyData.rec.x = 0; // Set the initial X position of the rectangle
     scarfyData.rec.y = 0; // Set the initial Y position of the rectangle
-    scarfyData.pos.x = windowWidth/5 - scarfyData.rec.width/5; // Set the initial X position of the scarfy character
-    scarfyData.pos.y = windowHeight - scarfyData.rec.height; // Set the initial Y position of the scarfy character
+    scarfyData.pos.x = windowDimensions[0]/5 - scarfyData.rec.width/5; // Set the initial X position of the scarfy character
+    scarfyData.pos.y = windowDimensions[1] - scarfyData.rec.height; // Set the initial Y position of the scarfy character
     scarfyData.frame = 0;
     scarfyData.updateTime = 1.f/12.f; // Set the time between frames (12 frames per second)
     scarfyData.runningTime = 0.0f; // Set the initial running time of the animation
@@ -41,24 +44,24 @@ int main()
     // Load the texture for nebula hazard
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png"); // Load the texture for the nebula hazard
 
-    int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
-    // AnimData struct for nebula
     AnimData nebData{
-            {0.f, 0.f, (float)nebula.width/8, (float)nebula.height/8}, // Set the rectangle for the nebula hazard
-            {windowWidth, (float)windowWidth - nebula.height/8}, // Set the initial position of the nebula hazard
-            0, // Set the initial frame of the nebula animation
-            {1.f/12.f}, // Set the time between frames (12 frames per second)
-            0 // Set the initial running time of the nebula animation
-        };
+        {0.f, 0.f, nebula.width/8.f, nebula.height/8.f}, // Set the rectangle for the nebula hazard
+        {windowDimensions[0] + 300.f, windowDimensions[1] - nebula.height/8.f}, // Set the initial position of the nebula hazard
+        0, // Set the initial frame of the nebula hazard
+        1.f/16.f, // Set the time between frames (12 frames per second)
+        0.0f // Set the initial running time of the nebula hazard
+    };
 
-    // AnimData struct for nebula2
     AnimData nebData2{
-                {0.f, 0.f, (float)nebula.width/8, (float)nebula.height/8}, // Set the rectangle for the nebula hazard
-                {windowWidth +300, (float)windowWidth - nebula.height/8}, // Set the initial position of the nebula hazard
-                0, // Set the initial frame of the nebula animation
-                {1.f/16.f}, // Set the time between frames (12 frames per second)
-                0 // Set the initial running time of the nebula animation
-            };
+            {0.f, 0.f, nebula.width/8.f, nebula.height/8.f}, // Set the rectangle for the nebula hazard
+            {windowDimensions[0] + 300.f, windowDimensions[1] - nebula.height/8.f}, // Set the initial position of the nebula hazard
+            0, // Set the initial frame of the nebula hazard
+            1.f/16.f, // Set the time between frames (12 frames per second)
+            0.0f // Set the initial running time of the nebula hazard
+        };
+    int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
+
+    AnimData nebulae[2]{ nebData, nebData2 }; // Create an array of AnimData structs for the nebula hazards
 
 
     while (!WindowShouldClose())
@@ -87,47 +90,47 @@ int main()
         }
 
         // Update nebula animation
-        nebData.runningTime += deltaTime; // Update the running time
-        if (nebData.runningTime>= nebData.updateTime)
+        nebulae[0].runningTime += deltaTime; // Update the running time
+        if (nebulae[0].runningTime >= nebulae[0].updateTime)
         {
-            nebData.runningTime = 0.0f; // Reset the running time
+            nebulae[0].runningTime = 0.0f; // Reset the running time
             // updated animation frame
-            nebData.rec.x = nebData.frame * nebData.rec.width; // Update the X position of the rectangle based on the frame
-            nebData.frame++; // Increment the frame
-            if (nebData.frame > 7) // Check if the frame is greater than 7
+            nebulae[0].rec.x = nebulae[0].frame * nebulae[0].rec.width; // Update the X position of the rectangle based on the frame
+            nebulae[0].frame++; // Increment the frame
+            if (nebulae[0].frame > 7) // Check if the frame is greater than 7
             {
-                nebData.frame = 0; // Reset the frame to 0
+                nebulae[0].frame = 0; // Reset the frame to 0
             }
         }
 
         // Update nebula2 animation
-        nebData2.runningTime += deltaTime; // Update the running time
-        if (nebData2.runningTime>= nebData2.updateTime)
+        nebulae[1].runningTime += deltaTime; // Update the running time
+        if (nebulae[1].runningTime>= nebulae[1].updateTime)
         {
-            nebData2.runningTime = 0.0f; // Reset the running time
+            nebulae[1].runningTime = 0.0f; // Reset the running time
             // updated animation frame
-            nebData2.rec.x = nebData2.frame * nebData2.rec.width; // Update the X position of the rectangle based on the frame
-            nebData2.frame; // Increment the frame
-            if (nebData2.frame > 7) // Check if the frame is greater than 7
+            nebulae[1].rec.x = nebulae[1].frame * nebulae[1].rec.width; // Update the X position of the rectangle based on the frame
+            nebulae[1].frame; // Increment the frame
+            if (nebulae[1].frame > 7) // Check if the frame is greater than 7
             {
-                nebData2.frame = 0; // Reset the frame to 0
+                nebulae[1].frame = 0; // Reset the frame to 0
             }
         }
 
 
         scarfyData.pos.y += velocity * deltaTime; // Update scarfy position
-        nebData.pos.x += nebVelocity * deltaTime; // Update the nebula position
-        nebData2.pos.x += nebVelocity * deltaTime; // Update the second nebula position
+        nebulae[0].pos.x += nebVelocity * deltaTime; // Update the nebula position
+        nebulae[1].pos.x += nebVelocity * deltaTime; // Update the second nebula position
 
         DrawTextureRec(scarfy, scarfyData.rec, scarfyData.pos, RED); // Draw the scarfy character
-        DrawTextureRec(nebula, nebData.rec, nebData2.pos, WHITE); // Draw the nebula hazard
-        DrawTextureRec(nebula, nebData2.rec, nebData2.pos, PURPLE); // Draw the second nebula hazard
+        DrawTextureRec(nebula, nebulae[0].rec, nebulae[0].pos, WHITE); // Draw the nebula hazard
+        DrawTextureRec(nebula, nebulae[1].rec, nebulae[1].pos, PURPLE); // Draw the second nebula hazard
 
         if (IsKeyPressed(KEY_SPACE) && !isAirborne) // Check if the space key is pressed
         {
             velocity = -jumpHeight; // Set the velocity when space is pressed
         }
-        else if (scarfyData.pos.y < windowHeight - scarfyData.rec.height) // Check if the rectangle is not on the ground
+        else if (scarfyData.pos.y < windowDimensions[1] - scarfyData.rec.height) // Check if the rectangle is not on the ground
         {
             velocity += gravity * deltaTime; // Increase the velocity to simulate gravity
             isAirborne = true; // Set the airborne state to true
@@ -135,7 +138,7 @@ int main()
         else // If the rectangle is on the ground
         {
             velocity = 0; // Set the velocity to 0
-            scarfyData.pos.y = windowHeight - scarfyData.rec.height; // Reset the Y position of the rectangle to the ground level
+            scarfyData.pos.y = windowDimensions[1] - scarfyData.rec.height; // Reset the Y position of the rectangle to the ground level
             isAirborne = false; // Set the airborne state to false
         }
 
