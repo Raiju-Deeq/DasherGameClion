@@ -44,24 +44,26 @@ int main()
     // Load the texture for nebula hazard
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png"); // Load the texture for the nebula hazard
 
-    AnimData nebData{
-        {0.f, 0.f, nebula.width/8.f, nebula.height/8.f}, // Set the rectangle for the nebula hazard
-        {windowDimensions[0] + 300.f, windowDimensions[1] - nebula.height/8.f}, // Set the initial position of the nebula hazard
-        0, // Set the initial frame of the nebula hazard
-        1.f/16.f, // Set the time between frames (12 frames per second)
-        0.0f // Set the initial running time of the nebula hazard
-    };
 
-    AnimData nebData2{
-            {0.f, 0.f, nebula.width/8.f, nebula.height/8.f}, // Set the rectangle for the nebula hazard
-            {windowDimensions[0] + 300.f, windowDimensions[1] - nebula.height/8.f}, // Set the initial position of the nebula hazard
-            0, // Set the initial frame of the nebula hazard
-            1.f/16.f, // Set the time between frames (12 frames per second)
-            0.0f // Set the initial running time of the nebula hazard
-        };
     int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
 
-    AnimData nebulae[2]{ nebData, nebData2 }; // Create an array of AnimData structs for the nebula hazards
+    AnimData nebulae[3]{}; // Create an array of AnimData structs for the nebula hazards
+
+    for (int i = 0; i < 3; i++)
+    {
+        nebulae[i].rec.x = 0.f;
+        nebulae[i].rec.y = 0.f;
+        nebulae[i].rec.width = nebula.width/8.f;
+        nebulae[i].rec.height = nebula.height/8.f;
+        nebulae[i].pos.y = windowDimensions[1] - nebula.height/8.f;
+        nebulae[i].frame = 0;
+        nebulae[i].runningTime = 0.0f;
+        nebulae[i].updateTime = 1.f/16.f; // Set the time between frames (16 frames per second)
+    }
+
+    nebulae[0].pos.x = windowDimensions[0]; // Set the initial X position of the first nebula hazard
+    nebulae[1].pos.x = windowDimensions[0] + 300.f; // Set the initial X position of the second nebula hazard
+    nebulae[2].pos.x = windowDimensions[0] + 600.f; // Set the initial X position of the third nebula hazard
 
 
     while (!WindowShouldClose())
