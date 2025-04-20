@@ -42,6 +42,7 @@ int main()
     // Initialize the window
     InitWindow (windowDimensions[0], windowDimensions[1], "Dasher Game");
     SetTargetFPS (60);
+    bool collision{}; // Set the initial collision state to false
 
     // Scarfy variables
     int velocity{0}; // Set the initial velocity of the rectangle
@@ -80,7 +81,7 @@ int main()
     int nebVelocity{-600}; // Set the initial velocity of the nebula hazard
 
 
-    const int sizeOfNebula = 6; // Set the size of the nebula array
+    const int sizeOfNebula = 3; // Set the size of the nebula array
     AnimData nebulae[sizeOfNebula]{}; // Create an array of AnimData structs for the nebula hazards
 
     for (int i = 0; i < sizeOfNebula; i++)
@@ -164,12 +165,48 @@ int main()
 
         finishLine += nebVelocity * deltaTime; // Update the finish line position
 
-        DrawTextureRec(scarfy, scarfyData.rec, scarfyData.pos, BLUE); // Draw the scarfy character
 
-        for (int i =0; i <sizeOfNebula; i++)
+        for (AnimData nebula : nebulae) // Loop through the nebula hazards
         {
-            DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, ORANGE); // Draw the nebula hazard
+            float pad{50.f}; // Set the padding value
+            Rectangle nebRec {
+                nebula.pos.x + pad,
+                nebula.pos.y + pad,
+                nebula.rec.width - pad * 2,
+                nebula.rec.height - pad * 2
+            };
+            Rectangle scarfyRec {
+                scarfyData.pos.x ,
+                scarfyData.pos.y ,
+                scarfyData.rec.width,
+                scarfyData.rec.height
+            };
+            if (CheckCollisionRecs(nebRec, scarfyRec)) // Check for collision between the nebula and scarfy
+            {
+                collision = true; // Set the collision state to true
+            }
         }
+
+        if (collision) // Check if there is a collision
+        {
+            DrawText("GAME OVER", windowDimensions[0]/2 - 50, windowDimensions[1]/2 - 20, 20, RED); // Draw the game over text
+            velocity = 0; // Set the velocity to 0
+        }
+        else if (scarfyData.pos.x > finishLine)
+        {
+            DrawText("You Win!", windowDimensions[0]/2 - 50, windowDimensions[1]/2 - 20, 20, GREEN); // Draw the win text
+        }
+        else
+            {
+            for (int i =0; i <sizeOfNebula; i++)
+            {
+                DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, ORANGE); // Draw the nebula hazard
+            }
+            DrawTextureRec(scarfy, scarfyData.rec, scarfyData.pos, BLUE); // Draw the scarfy character
+        }
+
+
+
 
         if (IsKeyPressed(KEY_SPACE) && (isOnGround(scarfyData, windowDimensions[1]))) // Check if the space key is pressed
         {
